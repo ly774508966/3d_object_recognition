@@ -1,0 +1,49 @@
+﻿Build started 2016/3/12 21:04:17.
+     1>Project "C:\tmp\kinect\PGDemo\PGDemo\PGDemo.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I..\inc /I..\eigen /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D _CRT_SECURE_NO_WARNINGS /D _MBCS /D _AFXDLL /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\PGDemo.pch" /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt PGDemoDlg.cpp
+         PGDemoDlg.cpp
+     1>c:\tmp\kinect\pgdemo\inc\opencv2\core\mat.hpp(1965): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>c:\tmp\kinect\pgdemo\inc\opencv2\core\persistence.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>c:\tmp\kinect\pgdemo\inc\opencv2\core\utility.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(286): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(302): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(585): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(597): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(868): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(878): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(880): warning C4018: '>' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(937): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(956): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(995): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(1008): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(1010): warning C4018: '>' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(1020): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(1090): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(1176): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(1227): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(1244): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(1372): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(1473): warning C4018: '>' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(1547): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(1558): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(1599): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\tmp\kinect\pgdemo\pgdemo\pgdemodlg.cpp(1614): warning C4018: '<' : signed/unsigned mismatch
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\tmp\kinect\PGDemo\Debug\PGDemo.exe" /INCREMENTAL /NOLOGO /LIBPATH:..\lib opengl32.lib glut32.lib opencv_core310d.lib opencv_imgcodecs310d.lib opencv_imgproc310d.lib opencv_highgui310d.lib kinect20.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\Include\Manifest\dpiaware.manifest" /DEBUG /PDB:"C:\tmp\kinect\PGDemo\Debug\PGDemo.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\tmp\kinect\PGDemo\Debug\PGDemo.lib" /MACHINE:X86 Debug\PGDemo.res
+         Debug\ConfigIO.obj
+         Debug\DebugLog.obj
+         Debug\GCloud.obj
+         Debug\GObject.obj
+         Debug\GPlane.obj
+         Debug\GPoint.obj
+         Debug\GTarget.obj
+         Debug\PGDemo.obj
+         Debug\PGDemoDlg.obj
+         Debug\stdafx.obj
+         PGDemo.vcxproj -> C:\tmp\kinect\PGDemo\Debug\PGDemo.exe
+     1>Done Building Project "C:\tmp\kinect\PGDemo\PGDemo\PGDemo.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.50

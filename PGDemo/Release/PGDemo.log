@@ -1,0 +1,51 @@
+﻿Build started 2016/3/14 11:30:59.
+     1>Project "C:\tmp\kinect\PGDemo\PGDemo\PGDemo.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I..\inc /I..\eigen /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D WIN32 /D _WINDOWS /D NDEBUG /D _CRT_SECURE_NO_WARNINGS /D _MBCS /D _AFXDLL /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Release\PGDemo.pch" /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt PGDemoDlg.cpp
+         PGDemoDlg.cpp
+     1>C:\tmp\kinect\PGDemo\inc\opencv2/core/mat.hpp(1965): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>C:\tmp\kinect\PGDemo\inc\opencv2/core/persistence.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>C:\tmp\kinect\PGDemo\inc\opencv2/core/utility.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>PGDemoDlg.cpp(286): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(302): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(586): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(598): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(859): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(869): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(871): warning C4018: '>' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(931): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(950): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(989): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(1002): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(1004): warning C4018: '>' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(1014): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(1084): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(1170): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(1221): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(1238): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(1365): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(1466): warning C4018: '>' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(1540): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(1551): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(1592): warning C4018: '<' : signed/unsigned mismatch
+     1>PGDemoDlg.cpp(1607): warning C4018: '<' : signed/unsigned mismatch
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\tmp\kinect\PGDemo\Release\PGDemo.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:..\lib opengl32.lib glut32.lib opencv_core310.lib opencv_imgcodecs310.lib opencv_imgproc310.lib opencv_highgui310.lib kinect20.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\Include\Manifest\dpiaware.manifest" /DEBUG /PDB:"C:\tmp\kinect\PGDemo\Release\PGDemo.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\tmp\kinect\PGDemo\Release\PGDemo.lib" /MACHINE:X86 /SAFESEH Release\PGDemo.res
+         Release\ConfigIO.obj
+         Release\DebugLog.obj
+         Release\GCloud.obj
+         Release\GObject.obj
+         Release\GPlane.obj
+         Release\GPoint.obj
+         Release\GTarget.obj
+         Release\PGDemo.obj
+         Release\PGDemoDlg.obj
+         Release\stdafx.obj
+         Generating code
+         Finished generating code
+         PGDemo.vcxproj -> C:\tmp\kinect\PGDemo\Release\PGDemo.exe
+     1>Done Building Project "C:\tmp\kinect\PGDemo\PGDemo\PGDemo.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:07.58
