@@ -200,6 +200,8 @@ public:
 	//flag to save kinect frame
 	bool m_saveFrame;
 
+	bool m_saveResult;
+
 	//default path for reference target
 	CString m_refDirectory;
 	CString m_path;
@@ -242,4 +244,5 @@ public:
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	afx_msg void OnBnClickedButtonProcess();
 	afx_msg void OnBnClickedButtonRestoreview();
+	afx_msg void OnBnClickedButtonRecognitionresult();
 };

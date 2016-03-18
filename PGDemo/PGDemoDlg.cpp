@@ -40,7 +40,8 @@ CPGDemoDlg::CPGDemoDlg(CWnd* pParent /*=NULL*/)
 	m_pDepthRGBX(NULL),
 	m_mapper(NULL),
 	m_scale(1.0),
-	m_saveFrame(false)
+	m_saveFrame(false),
+	m_saveResult(false)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -70,6 +71,7 @@ BEGIN_MESSAGE_MAP(CPGDemoDlg, CDialogEx)
 	ON_WM_MOUSEWHEEL()
 	ON_BN_CLICKED(IDC_BUTTON_PROCESS, &CPGDemoDlg::OnBnClickedButtonProcess)
 	ON_BN_CLICKED(IDC_BUTTON_RESTOREVIEW, &CPGDemoDlg::OnBnClickedButtonRestoreview)
+	ON_BN_CLICKED(IDC_BUTTON_RECOGNITIONRESULT, &CPGDemoDlg::OnBnClickedButtonRecognitionresult)
 END_MESSAGE_MAP()
 
 
@@ -97,6 +99,7 @@ BOOL CPGDemoDlg::OnInitDialog()
 		exit(0);
 	}
 	_mkdir(m_path + "\\data");
+	_mkdir(m_path + "\\result");
 	_CreateLog(m_path.GetBuffer());
 	m_config.UpdateFilePath(m_path);
 	m_config.LoadKinectZLimit(m_minZLimit, m_maxZLimit);
@@ -850,7 +853,8 @@ void CPGDemoDlg::OnBnClickedButtonCalibrate()
 	//m_planeList.push_back(new_plane);
 	ReleaseMutex(m_hPaintMutex);
 	m_config.SaveBkCalibration(-plane_pnt, rot_axis, rot_rad);
-	SendMessage(WM_PAINT);
+	if (!m_bKinectStreaming)
+		SendMessage(WM_PAINT);
 }
 
 void CPGDemoDlg::SaveSegmentImg(CString fn, std::vector<int> ind_list)
@@ -915,11 +919,20 @@ void CPGDemoDlg::OnBnClickedButtonTest()
 	//LoadSegmentImg("c:\\tmp\\kinect\\bk.jpg", test_list);
 	//SaveSegmentImg("c:\\tmp\\kinect\\bk1.jpg", test_list);
 	//SaveDepth2ColorMapping();
-	PreprocessDepth2ColorMapping("c:\\tmp\\kinect\\depth2color.txt");
-	//m_config.LoadBkCalibration(m_bkTrans, m_bkRotAxis, m_bkRotRad);
-	//m_SceneCld.Rotate(GPoint(0, 0, 0), m_bkRotAxis, -m_bkRotRad);
-	//m_SceneCld.Translate(-m_bkTrans);
-	//m_SceneCld.Save("c:\\tmp\\kinect\\cld.asc");
+	//PreprocessDepth2ColorMapping("c:\\tmp\\kinect\\depth2color.txt");
+	m_config.LoadBkCalibration(m_bkTrans, m_bkRotAxis, m_bkRotRad);
+	for (int i = 2; i < 32; i++)
+	{
+		CString ss;
+		ss.Format("%s\\result\\bk_calibrated\\%d_scene.asc", m_path, i);
+		GCloud cld;
+		cld.Load(ss.GetString());
+		cld.Rotate(GPoint(0, 0, 0), m_bkRotAxis, -m_bkRotRad);
+		cld.Translate(-m_bkTrans);
+		ss.Format("%s\\result\\%d_scene.asc", m_path, i);
+		cld.Save(ss.GetBuffer());
+	}
+	
 }
 
 void CPGDemoDlg::UpdateValidFlags(std::vector<int> ind_list, int flag)
@@ -1143,8 +1156,19 @@ void CPGDemoDlg::ProcessScene()
 		m_targetBoxPnts.push_back(cld.m_boxMaxPnt);
 		target.m_cld = cld;
 		target.m_indexList = index_list;
-		if(PaintTargetInColor(target))
-			m_targets.push_back(target);		
+		if (PaintTargetInColor(target))
+		{
+			m_targets.push_back(target);
+			if (m_saveResult)
+			{
+				CString ss, txt;
+				GetDlgItemText(IDC_EDIT_SAVENAME, txt);
+				ss.Format("%s\\result\\%s", m_path, txt);
+				cv::imwrite((ss + "_color.jpg").GetBuffer(), m_colorMat);
+				m_SceneCld.Save((ss + "_scene.asc").GetBuffer());
+				m_saveResult = false;
+			}
+		}
 	}
 	//cv::imwrite("c:\\tmp\\kinect\\contours.jpg", result);
 	_Write2LogSI("extract target number:", m_targets.size());
@@ -1623,4 +1647,10 @@ void CPGDemoDlg::OnBnClickedButtonRestoreview()
 	m_scale = 1;
 	if (!m_bKinectStreaming)
 		SendMessage(WM_PAINT);
+}
+
+
+void CPGDemoDlg::OnBnClickedButtonRecognitionresult()
+{
+	m_saveResult = true;
 }
