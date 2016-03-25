@@ -145,7 +145,6 @@ public:
 
 	//handler
 	HANDLE m_hProcessThread;
-	HANDLE m_hPaintMutex;
 
 	//kinect color frame
 	cv::Mat m_colorMat;
@@ -245,4 +244,7 @@ public:
 	afx_msg void OnBnClickedButtonProcess();
 	afx_msg void OnBnClickedButtonRestoreview();
 	afx_msg void OnBnClickedButtonRecognitionresult();
+	afx_msg void OnBnClickedButtonDisconnect();
+	afx_msg void OnBnClickedCheckProcess();
+	afx_msg void OnBnClickedCancel();
 };

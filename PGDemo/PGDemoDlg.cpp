@@ -22,7 +22,6 @@ CPGDemoDlg::CPGDemoDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CPGDemoDlg::IDD, pParent),
 	m_Kinect(NULL),
 	m_hProcessThread(NULL),
-	m_hPaintMutex(NULL),
 	m_bKinectConnected(false),
 	m_bKinectStreaming(false),
 	m_RotX(0),
@@ -72,6 +71,9 @@ BEGIN_MESSAGE_MAP(CPGDemoDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_PROCESS, &CPGDemoDlg::OnBnClickedButtonProcess)
 	ON_BN_CLICKED(IDC_BUTTON_RESTOREVIEW, &CPGDemoDlg::OnBnClickedButtonRestoreview)
 	ON_BN_CLICKED(IDC_BUTTON_RECOGNITIONRESULT, &CPGDemoDlg::OnBnClickedButtonRecognitionresult)
+	ON_BN_CLICKED(IDC_BUTTON_DISCONNECT, &CPGDemoDlg::OnBnClickedButtonDisconnect)
+	ON_BN_CLICKED(IDC_CHECK_PROCESS, &CPGDemoDlg::OnBnClickedCheckProcess)
+	ON_BN_CLICKED(IDCANCEL, &CPGDemoDlg::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
 
@@ -161,14 +163,12 @@ void CPGDemoDlg::OnPaint()
 	}
 	else
 	{
-		//_Write2LogS("paint");
-		WaitForSingleObject(m_hPaintMutex, INFINITE);
+		m_bKinectStreaming = false;
 		cv::imshow("Color Frame", m_colorMat);
 		//ShowScaleImage("Color Frame", &m_colorMat);
 		//cv::imshow("Depth Frame", m_depthMat);		
 		RenderScene();
-		ReleaseMutex(m_hPaintMutex);
-
+		m_bKinectStreaming = true;
 		CDialogEx::OnPaint();
 	}
 }
@@ -402,8 +402,10 @@ void CPGDemoDlg::OnBnClickedButtonConnect()
 	{
 		m_bKinectConnected = true;
 		m_bKinectStreaming = true;
-		m_hPaintMutex = CreateMutex(NULL, FALSE, NULL);
 		m_hProcessThread = CreateThread(NULL, 0, ProcessThread, this, 0, NULL);
+
+		((CButton*)GetDlgItem(IDC_BUTTON_CONNECT))->EnableWindow(false);
+		((CButton*)GetDlgItem(IDC_BUTTON_DISCONNECT))->EnableWindow(true);
 	}
 }
 
@@ -416,8 +418,18 @@ DWORD WINAPI CPGDemoDlg::ProcessThread(LPVOID lpParam)
 DWORD WINAPI CPGDemoDlg::ProcessThread()
 {
 	DWORD wait_mills = 0;
-	while (m_bKinectStreaming)
+	while (true)
 	{
+		if (!m_bKinectConnected)
+		{
+			break;
+		}
+
+		if (!m_bKinectStreaming)
+		{
+			continue;
+		}
+
 		//_Write2LogS("start process");
 		bool b_depth_grabbed = false;
 		IColorFrame* color_frame = NULL;
@@ -430,7 +442,6 @@ DWORD WINAPI CPGDemoDlg::ProcessThread()
 		}
 		if (SUCCEEDED(hr))
 		{
-			WaitForSingleObject(m_hPaintMutex, INFINITE);
 			GetColorFrame(color_frame, &m_colorMat);
 			b_depth_grabbed = GetDepthFrame(depth_frame, &m_depthMat16);
 			if (b_depth_grabbed)
@@ -459,13 +470,12 @@ DWORD WINAPI CPGDemoDlg::ProcessThread()
 				std::time(&t);
 				std::tm* data;
 				data = std::localtime(&t);
-				ss.Format("c:\\tmp\\kinect\\data\\%.2d%.2d%.2d%.2d", data->tm_mday, data->tm_hour, data->tm_min, data->tm_sec);
+				ss.Format("%s\\data\\%.2d%.2d%.2d%.2d", m_path, data->tm_mday, data->tm_hour, data->tm_min, data->tm_sec);
 				cv::imwrite((ss + "_color.jpg").GetBuffer(), m_colorMat);
 				cv::imwrite((ss + "_depth.jpg").GetBuffer(), m_depthMat);
 				m_SceneCld.Save((ss + "_scene.asc").GetBuffer());
 				m_saveFrame = false;
 			}
-			ReleaseMutex(m_hPaintMutex);
 		}
 		SafeRelease(color_frame);
 		SafeRelease(depth_frame);
@@ -683,11 +693,9 @@ void CPGDemoDlg::SaveScene()
 		data = std::localtime(&t);
 		ss.Format("%s\\data\\%.2d%.2d%.2d%.2d", m_path, data->tm_mday, data->tm_hour, data->tm_min, data->tm_sec);
 
-		WaitForSingleObject(m_hPaintMutex, INFINITE);
 		cv::imwrite((ss + "_color.jpg").GetBuffer(), m_colorMat);
 		cv::imwrite((ss + "_depth.jpg").GetBuffer(), m_depthMat);
 		m_SceneCld.Save((ss + "_scene.asc").GetBuffer());
-		ReleaseMutex(m_hPaintMutex);
 	}
 	
 }
@@ -710,46 +718,6 @@ void CPGDemoDlg::LoadScene(CString fn)
 void CPGDemoDlg::OnDestroy()
 {
 	CDialogEx::OnDestroy();
-
-	if (m_validFlags)
-		delete[]m_validFlags;
-
-	if (m_pColorRGBX)
-	{
-		delete[]m_pColorRGBX;
-		m_pColorRGBX = NULL;
-	}
-	if (m_pDepthRGBX)
-	{
-		delete[]m_pDepthRGBX;
-		m_pDepthRGBX = NULL;
-	}
-
-	SafeRelease(m_colorReader);
-	SafeRelease(m_depthReader);
-
-	if (m_Kinect)
-		m_Kinect->Close();
-
-	if (m_hProcessThread)
-	{
-		WaitForSingleObject(m_hProcessThread, INFINITE);
-		CloseHandle(m_hProcessThread);
-	}
-	
-	m_colorMat.release();
-	m_depthMat.release();
-	cv::destroyAllWindows();
-	if (m_dc)
-	{
-		DeleteDC(m_dc);
-	}
-
-	// Destroy paint window mutex
-	if (m_hPaintMutex)
-	{
-		CloseHandle(m_hPaintMutex);
-	}	
 }
 
 void CPGDemoDlg::OnLButtonDown(UINT nFlags, CPoint point)
@@ -782,7 +750,7 @@ void CPGDemoDlg::OnMouseMove(UINT nFlags, CPoint point)
 		m_MouseX = x;
 		m_MouseY = y;		
 	}
-	if (!m_bKinectStreaming)
+	if (!m_bKinectConnected)
 		SendMessage(WM_PAINT);
 
 	CDialogEx::OnMouseMove(nFlags, point);
@@ -794,7 +762,7 @@ BOOL CPGDemoDlg::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 		m_scale *= 0.85;
 	else
 		m_scale *= 1.15;
-	if (!m_bKinectStreaming)
+	if (!m_bKinectConnected)
 		SendMessage(WM_PAINT);
 	return CDialogEx::OnMouseWheel(nFlags, zDelta, pt);
 }
@@ -836,7 +804,8 @@ void CPGDemoDlg::OnBnClickedButtonCalibrate()
 		return;
 
 	GPoint plane_pnt, plane_nor;
-	WaitForSingleObject(m_hPaintMutex, INFINITE);
+	if (m_bKinectConnected)
+		m_bKinectStreaming = false;
 	m_SceneCld.FilterPnts();
 	m_inlierList = m_SceneCld.Fit2PlaneRejection(plane_pnt, plane_nor);	
 	SaveSegmentImg(m_path+"\\bk.jpg", m_inlierList);
@@ -848,12 +817,14 @@ void CPGDemoDlg::OnBnClickedButtonCalibrate()
 	rot_axis.Normalize();
 	double rot_rad = plane_nor.Angle2Vector(GPoint(0, 0, 1), rot_axis);
 	m_SceneCld.Rotate(GPoint(0, 0, 0), rot_axis, rot_rad);
-	//m_SceneCld.Save("c:\\tmp\\kinect\\bk.asc");
-	//new_plane.Rotate(GPoint(0, 0, 0), rot_axis, rot_rad);
-	//m_planeList.push_back(new_plane);
-	ReleaseMutex(m_hPaintMutex);
+
 	m_config.SaveBkCalibration(-plane_pnt, rot_axis, rot_rad);
-	if (!m_bKinectStreaming)
+	if (m_bKinectConnected)
+	{
+		m_bKinectStreaming = true;
+		((CButton*)GetDlgItem(IDC_CHECK_BACKGROUND_CALIBRATED))->SetCheck(true);
+	}
+	if (!m_bKinectConnected)
 		SendMessage(WM_PAINT);
 }
 
@@ -1078,10 +1049,10 @@ void CPGDemoDlg::ProcessScene()
 		//after adding potential valid poitn, try to find contours again
 		std::vector<std::vector<cv::Point>> proj_contours;
 		cv::findContours(proj, proj_contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
-		cv::Mat proj_contour(img.size(), CV_8U, cv::Scalar(0));
-		cv::drawContours(proj_contour, proj_contours, -1, cv::Scalar(255), CV_FILLED);
-		txt.Format("c:\\tmp\\kinect\\contour_%d.jpg", i);
-		cv::imwrite(txt.GetBuffer(), proj_contour);
+		//cv::Mat proj_contour(img.size(), CV_8U, cv::Scalar(0));
+		//cv::drawContours(proj_contour, proj_contours, -1, cv::Scalar(255), CV_FILLED);
+		//txt.Format("c:\\tmp\\kinect\\contour_%d.jpg", i);
+		//cv::imwrite(txt.GetBuffer(), proj_contour);
 		proj.release();
 		delete[]blob_flag;
 		if (proj_contours.size() == 0)
@@ -1136,15 +1107,15 @@ void CPGDemoDlg::ProcessScene()
 			GPoint cen_pnt(fit_ellipse.center.x, fit_ellipse.center.y, 0.0f);
 			target.m_center = cen_pnt;
 			fit_ellipse.points(vertices);
-			for (int m = 0; m<4; m++)
-			{
-				cv::line(proj_contour, vertices[m], vertices[(m + 1) % 4], cv::Scalar(128));    
-			}
+			//for (int m = 0; m<4; m++)
+			//{
+			//	cv::line(proj_contour, vertices[m], vertices[(m + 1) % 4], cv::Scalar(128));    
+			//}
 			for (int m = 0; m < 4; m++)
 				target.m_vertexs.push_back(GPoint(vertices[m].x, vertices[m].y, 0.0f));
 		}
-		cv::imwrite(txt.GetBuffer(), proj_contour);
-		proj_contour.release();
+		//cv::imwrite(txt.GetBuffer(), proj_contour);
+		//proj_contour.release();
 		cld.UpdateBndBox();
 		cld.m_boxMinPnt[2] = 0;//set to zero
 		if (cld.m_boxMaxPnt[2] < height_thres)
@@ -1516,10 +1487,12 @@ void CPGDemoDlg::SaveDepth2ColorMapping()
 	if (!m_bKinectStreaming)
 		return;
 	CStdioFile map_file;
-	if (map_file.Open("c:\\tmp\\kinect\\depth2color.txt", CStdioFile::modeCreate | CStdioFile::modeWrite))
+	CString fname;
+	fname.Format("%s\\depth2color.txt", m_path);
+	if (map_file.Open(fname, CStdioFile::modeCreate | CStdioFile::modeWrite))
 	{
 		CString txt;
-		WaitForSingleObject(m_hPaintMutex, INFINITE);
+		m_bKinectStreaming = false;
 		for (int j = 0; j < m_depthHeight; j++)
 		{
 			for (int i = 0; i < m_depthWidth; i++)
@@ -1533,7 +1506,7 @@ void CPGDemoDlg::SaveDepth2ColorMapping()
 			}
 		}
 		map_file.Close();
-		ReleaseMutex(m_hPaintMutex);
+		m_bKinectStreaming = true;
 	}
 }
 
@@ -1645,7 +1618,7 @@ void CPGDemoDlg::OnBnClickedButtonRestoreview()
 	m_TransX = 0;
 	m_TransY = 0;
 	m_scale = 1;
-	if (!m_bKinectStreaming)
+	if (!m_bKinectConnected)
 		SendMessage(WM_PAINT);
 }
 
@@ -1653,4 +1626,95 @@ void CPGDemoDlg::OnBnClickedButtonRestoreview()
 void CPGDemoDlg::OnBnClickedButtonRecognitionresult()
 {
 	m_saveResult = true;
+}
+
+
+void CPGDemoDlg::OnBnClickedButtonDisconnect()
+{
+	if (!m_bKinectConnected)
+		return;
+
+	m_bKinectConnected = false;
+
+	if (m_Kinect)
+	{
+		m_Kinect->Close();
+		m_Kinect = NULL;
+	}
+
+	if (m_hProcessThread)
+	{
+		//WaitForSingleObject(m_hProcessThread, INFINITE);
+		CloseHandle(m_hProcessThread);
+		m_hProcessThread = NULL;
+	}
+
+	
+	m_bKinectStreaming = false;
+
+	((CButton*)GetDlgItem(IDC_BUTTON_CONNECT))->EnableWindow(true);
+	((CButton*)GetDlgItem(IDC_BUTTON_DISCONNECT))->EnableWindow(false);
+}
+
+
+void CPGDemoDlg::OnBnClickedCheckProcess()
+{
+	if (!m_bKinectConnected)
+		return;
+
+	if (((CButton*)GetDlgItem(IDC_CHECK_PROCESS))->GetCheck())
+	{
+		if (!((CButton*)GetDlgItem(IDC_CHECK_BACKGROUND_CALIBRATED))->GetCheck())
+		{
+			AfxMessageBox("Background has to be calibrated before processing");
+			((CButton*)GetDlgItem(IDC_CHECK_PROCESS))->SetCheck(false);
+		}
+	}
+}
+
+
+void CPGDemoDlg::OnBnClickedCancel()
+{
+	m_bKinectStreaming = false;
+	cv::destroyAllWindows();
+	
+	if (m_validFlags)
+		delete[]m_validFlags;
+
+	if (m_pColorRGBX)
+	{
+		delete[]m_pColorRGBX;
+		m_pColorRGBX = NULL;
+	}
+	if (m_pDepthRGBX)
+	{
+		delete[]m_pDepthRGBX;
+		m_pDepthRGBX = NULL;
+	}
+
+	SafeRelease(m_colorReader);
+	SafeRelease(m_depthReader);
+
+	if (m_Kinect)
+	{
+		m_Kinect->Close();
+		m_Kinect = NULL;
+	}
+
+	if (m_hProcessThread)
+	{
+		//WaitForSingleObject(m_hProcessThread, INFINITE);
+		CloseHandle(m_hProcessThread);
+		m_hProcessThread = NULL;
+	}
+
+	m_colorMat.release();
+	m_depthMat.release();
+	
+	if (m_dc)
+	{
+		DeleteDC(m_dc);
+	}
+
+	CDialogEx::OnCancel();
 }
